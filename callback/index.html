@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QuickBooks OAuth Callback</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;max-width:760px;margin:48px auto;padding:0 20px;line-height:1.55;color:#172033;background:#fffaf3}
+    .card{background:white;border:1px solid #eadfce;border-radius:16px;padding:24px;box-shadow:0 10px 30px rgba(80,55,25,.08)}
+    code,textarea{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+    textarea{width:100%;min-height:120px;margin-top:10px;padding:12px;border-radius:10px;border:1px solid #d9cdbb}
+    button{background:#bf6f2f;color:white;border:0;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer}
+    .ok{color:#2f7d32;font-weight:700}.err{color:#b3261e;font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>QuickBooks authorization callback</h1>
+    <p id="status">Checking callback parameters…</p>
+    <p>Copy the full callback URL below and provide it to the local OAuth helper.</p>
+    <textarea id="url" readonly></textarea>
+    <p><button id="copy">Copy callback URL</button></p>
+    <p><small>This page does not store or transmit the authorization code anywhere. It only displays the URL that Intuit redirected here.</small></p>
+  </div>
+  <script>
+    const full = window.location.href;
+    const params = new URLSearchParams(window.location.search);
+    const status = document.getElementById('status');
+    document.getElementById('url').value = full;
+    if (params.get('code') && params.get('realmId') && params.get('state')) {
+      status.innerHTML = '<span class="ok">Authorization received.</span> Copy this URL and return to Hermes.';
+    } else if (params.get('error')) {
+      status.innerHTML = '<span class="err">Authorization error:</span> ' + params.get('error');
+    } else {
+      status.innerHTML = '<span class="err">Missing OAuth callback parameters.</span>';
+    }
+    document.getElementById('copy').onclick = async () => {
+      await navigator.clipboard.writeText(full);
+      document.getElementById('copy').textContent = 'Copied';
+    };
+  </script>
+</body>
+</html>
